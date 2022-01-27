@@ -2,9 +2,11 @@ require_relative "player"
 
 class Game
 
-    def initialize(player_1, player_2)
+    def initialize(*player_names)
 
-        @players = [Player.new(player_1), Player.new(player_2)]
+        @players = player_names.map { |player_name| Player.new(player_name)}
+
+        
         @fragment = ''
         @current_player = @players[0]
         @previous_player = @players[1]
@@ -33,13 +35,19 @@ class Game
 
     def switch_player
 
-        if @current_player == @players[0]
-            @current_player = @players[1]
-            @previous_player = @players[0]
-        else
+        i = @players.index(@current_player)
+
+        if i == @players.length-1
             @current_player = @players[0]
-            @previous_player = @players[1]
+        else
+            @current_player = @players[i+1]
         end
+
+        if @current_player.losses == 5
+            self.switch_player
+        end
+
+
     end
 
     def lose?(frag)
@@ -57,21 +65,64 @@ class Game
 
     end
 
+    def win?
+
+        @players.one? { |player| player.losses < 5 }
+
+    end
+
 
     def play_round
 
+
         if self.lose?(self.take_turn)
-            print "\n #{@current_player.name} has lost the game!\n game over"
-    
-            return nil
-        
+            print "\n Match found! #{@current_player.name} has lost the round!\n"
+            @current_player.losses += 1
+
+            case @current_player.losses
+
+                when 1
+                    puts '---------------------'
+                    print "\n #{@current_player.name} has 'G'\n"
+                    puts '---------------------'
+                when 2
+                    puts '---------------------'
+                    print "\n #{@current_player.name} has 'GH'\n"
+                    puts '---------------------'
+                when 3
+                    puts '---------------------'
+                    print "\n #{@current_player.name} has 'GHO'\n"
+                    puts '---------------------'
+                when 4
+                    puts '---------------------'
+                    print "\n #{@current_player.name} has 'GHOS'\n"
+                    puts '---------------------'
+                when 5
+                    puts '---------------------'
+                    print "\n #{@current_player.name} has 'GHOST!' \n They're out!\n"
+                    if self.win?
+                        winner = @players.select { |player| player.losses < 5 }
+                        print "\n#{winner[0].name} WINS!\n"
+                        return nil
+                    end
+
+            end
+
+            @fragment = ''
+            self.switch_player
+            self.play_round
+
         else
             self.play_round
         end
 
+        
+
 
     end
 
+
+
 end
 
-Game.new('will', 'jess').play_round
+Game.new('Will', 'Jess', 'Tammy').play_round
