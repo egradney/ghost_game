@@ -1,5 +1,4 @@
 require_relative "player"
-require_relative "dictionary"
 
 class Game
 
@@ -9,7 +8,7 @@ class Game
         @fragment = ''
         @current_player = @players[0]
         @previous_player = @players[1]
-        @dictionary = ['cormorant', 'stuck']
+        @dictionary = File.readlines("dictionary.txt").map(&:chomp)
 
     end
 
@@ -48,7 +47,8 @@ class Game
         if @dictionary.any? { |word| word == frag }
             return true
         end
-         false
+
+        false
     end
 
     def valid_play?(string)
