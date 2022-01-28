@@ -1,5 +1,6 @@
 
-class Player
+
+class AiPlayer
 
     attr_reader :name
     attr_accessor :losses
@@ -8,14 +9,14 @@ class Player
 
         @name = name
         @losses = 0
-
     end
 
     def guess
-        print "\n #{@name}, please enter your contribution to the fragment\n"
-        input = gets.chomp
-        input
+        alpha = 'abcdefghijklmnopqrstuvwxyz'
+        input = alpha[rand(26)]
+         
     end
+
 
 
 end

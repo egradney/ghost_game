@@ -1,10 +1,18 @@
 require_relative "player"
+require_relative "ai_player"
 
 class Game
 
-    def initialize(*player_names)
+    def initialize(players)
 
-        @players = player_names.map { |player_name| Player.new(player_name)}
+        @players = players.keys.map do |player_name| 
+                        if players[player_name] == 'human'
+                            Player.new(player_name) 
+                        else
+                            AiPlayer.new(player_name)
+                        end
+                    end
+
 
         
         @fragment = ''
@@ -16,18 +24,37 @@ class Game
 
     def take_turn
 
-        frag_add = @current_player.guess
-        
-        if self.valid_play?(frag_add)
-            @fragment += frag_add
-            puts "\n new fragment is: #{@fragment}"
-            if !self.lose?(@fragment)
-                self.switch_player
+        if @current_player.is_a? Player
+
+            frag_add = @current_player.guess
+            
+            if self.valid_play?(frag_add)
+                @fragment += frag_add
+                puts "\n new fragment is: '#{@fragment}'"
+                if !self.lose?(@fragment)
+                    self.switch_player
+                end
+            else
+                print "\n please enter a valid contribution"
+                print "\n current fragment is: '#{@fragment}'"
+                self.take_turn
             end
+
         else
-            print "\n please enter a valid addition"
-            print "\n current fragment is: #{@fragment}"
-            self.take_turn
+
+            frag_add = @current_player.guess
+
+            if self.valid_play?(frag_add)
+                @fragment += frag_add
+                puts "\n #{@current_player.name}'s contribution is '#{frag_add}'"
+                puts "\n new fragment is: '#{@fragment}'"
+                if !self.lose?(@fragment)
+                    self.switch_player
+                end
+            else
+                self.take_turn
+            end
+
         end
 
         @fragment
@@ -61,7 +88,7 @@ class Game
 
     def valid_play?(string)
 
-        ('a'...'z').include?(string) && @dictionary.any? { |word| word.start_with?(@fragment + string) }
+        ('a'..'z').include?(string) && @dictionary.any? { |word| word.start_with?(@fragment + string) }
 
     end
 
@@ -116,13 +143,15 @@ class Game
             self.play_round
         end
 
-        
+    end
 
+    def run 
+
+        self.play_round
 
     end
 
 
-
 end
 
-Game.new('Will', 'Jess', 'Tammy').play_round
+Game.new('Will' => 'human', 'Jess'=> 'human', 'Tammy' => 'ai').run
