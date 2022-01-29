@@ -12,6 +12,8 @@ class AiPlayer
     end
 
     def guess(fragment, fragment_length, number_of_current_players, possible_words)
+    # def guess(fragment_length, number_of_current_players, *possible_words)
+        # if fragment_length > 0
        
         if possible_words.any? { |possible| possible.length < fragment_length + number_of_current_players }
 
@@ -40,6 +42,10 @@ class AiPlayer
             input = random_move
         end
 
-    input
+    input 
+         
+    end
+
+
 
 end
